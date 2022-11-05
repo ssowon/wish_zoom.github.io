@@ -1,15 +1,36 @@
-const socket = io();
 
-const welcome = document.getElementById("welcome");
-const form = welcome.querySelector("form");
+function onGeoOk(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
 
-function handleRoomSubmit(event) {
-  event.preventDefault();
-  const input = form.querySelector("input");
-  socket.emit("enter_room", { payload: input.value }, () => {
-    console.log("server is done!");
+  const FormData = {
+    lat: lat,
+    lon: lon
+  }
+  console.log(FormData)
+
+  axios({
+    method: "post", // 요청 방식
+    url: "/weather", // 요청 주소
+    data: FormData
+  }).then((res) => {
+    console.log("왔다");
+    console.log(res);
   });
-  input.value = "";
+  // const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+
+  // fetch(url).then(response => response.json()).
+  // then(data => {
+  //   const city = document.querySelector("#weather span:first-child");
+  //   const weather = document.querySelector("#weather span:last-child");
+  //   city.innerText = '🧭'+data.name;
+  //   weather.innerText = `🌡${data.main.temp} / 🌈${data.weather[0].main}`;
+
+  // });
+
+}
+function onGeoError() {
+  alert("Can't find you. No weather for you.");
 }
 
-form.addEventListener("submit", handleRoomSubmit);
+navigator.geolocation.getCurrentPosition(onGeoOk,onGeoError);
